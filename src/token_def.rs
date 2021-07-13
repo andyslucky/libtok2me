@@ -2,6 +2,7 @@ use crate::regex_wrapper::*;
 use serde::Deserialize;
 
 /// Token has a type and a value
+#[derive(Debug, Clone)]
 pub struct Token {
     pub token_type: Option<String>,
     pub token_value: String,
