@@ -1,10 +1,24 @@
 use regex::*;
 use serde::de::{Deserializer, Error as DeError, Visitor};
 use serde::Deserialize;
-use std::fmt;
+use std::{fmt, str::FromStr};
 
 #[derive(Debug,Clone)]
 pub struct RegexWrapper(pub Regex);
+
+impl From<String> for RegexWrapper {
+    fn from(val : String) -> Self {
+        return RegexWrapper(Regex::new(val.as_str()).unwrap());
+    }
+}
+
+impl FromStr for RegexWrapper {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        return Ok(RegexWrapper(Regex::new(s).unwrap()));
+    }
+}
 
 struct REVisitor;
 
