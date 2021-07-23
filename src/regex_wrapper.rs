@@ -1,38 +1,36 @@
 use regex::*;
 use serde::de::{Deserializer, Error as DeError, Visitor};
 use serde::Deserialize;
-use std::{fmt, str::FromStr};
+use std::{fmt};
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct RegexWrapper(pub Regex);
 
 impl From<String> for RegexWrapper {
-    fn from(val : String) -> Self {
-        return RegexWrapper(Regex::new(val.as_str()).unwrap());
+    fn from(val: String) -> Self {
+        return RegexWrapper(Regex::new(&wrap(val)).unwrap());
     }
 }
 
-impl FromStr for RegexWrapper {
-    type Err = Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        return Ok(RegexWrapper(Regex::new(s).unwrap()));
+impl From<&str> for RegexWrapper {
+    fn from(v: &str) -> Self {
+        return RegexWrapper(Regex::new(&wrap(v)).unwrap());
     }
+}
+
+fn wrap<T>(string: T) -> String
+where
+    T: AsRef<str>,
+{
+    let mut temp = String::from("^");
+    temp.push_str(string.as_ref());
+    temp.push('$');
+    return temp;
 }
 
 struct REVisitor;
 
-impl REVisitor {
-    fn wrap<T>(&self, string: T) -> String
-    where
-        T: AsRef<str>,
-    {
-        let mut temp = String::from("^");
-        temp.push_str(string.as_ref());
-        temp.push('$');
-        return temp;
-    }
-}
+impl REVisitor {}
 
 impl<'de> Visitor<'de> for REVisitor {
     type Value = RegexWrapper;
@@ -45,14 +43,14 @@ impl<'de> Visitor<'de> for REVisitor {
     where
         E: DeError,
     {
-        Ok(RegexWrapper(Regex::new(self.wrap(v).as_str()).unwrap()))
+        Ok(RegexWrapper::from(v))
     }
 
     fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
     where
         E: DeError,
     {
-        Ok(RegexWrapper(Regex::new(self.wrap(v).as_str()).unwrap()))
+        Ok(RegexWrapper::from(v))
     }
 }
 
