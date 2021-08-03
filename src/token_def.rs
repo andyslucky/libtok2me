@@ -8,6 +8,12 @@ pub struct Token {
     pub token_value: String,
 }
 
+impl AsRef<Token> for Token {
+    fn as_ref(&self) -> &Token {
+        return self;
+    }
+}
+
 ///
 #[derive(Debug, Deserialize, Clone)]
 pub struct TokenDef {
